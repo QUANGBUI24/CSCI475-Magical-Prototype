@@ -8,30 +8,33 @@ public class PlayerActions : MonoBehaviour
     [SerializeField] float _playerMoveSpeed = 5f;   // Player's movement speed, adjustable in the Inspector
     [SerializeField] Rigidbody2D _playerRigidBody;  // Reference to the Rigidbody2D component for applying physics-based movement
     [SerializeField] Animator _playerAnimator;      // Reference to the Animator component to handle player animations
-    [SerializeField] Texture2D crosshairTexture;
+    [SerializeField] Texture2D _crosshairTexture;
+    [SerializeField] GameObject _bulletPrefab;
+    [SerializeField] Transform _gun;
 
+    WeaponStat _weaponStat;
     Vector2 _moveInput;          // Stores the input for player movement (horizontal and vertical axis)
     float _lastHorizontal = 0f;  // Stores the last non-zero horizontal input value (for direction when idle)
     float _lastVertical = -1f;   // Stores the last non-zero vertical input value (default facing down)
+    float _bulletSpeed;
+    float _fireRate;
+    float _bulletDamage;
+    float _nextFireTime = 0f; // Tracks when the gun can shoot next
 
     void Start()
     {
+        _weaponStat = _gun.GetComponent<WeaponStat>();
+        _bulletSpeed = _weaponStat.GetAmmoSpeed();
+        _fireRate = _weaponStat.GetWeaponFireRate();
+        _bulletDamage = _weaponStat.GetWeaponDamage();
         // Change the cursor to the crosshair and hide the default system cursor
-        Cursor.SetCursor(crosshairTexture, Vector2.zero, CursorMode.Auto);
+        Cursor.SetCursor(_crosshairTexture, Vector2.zero, CursorMode.Auto);
     }
 
     void Update()
     {
         UpdatePlayerAnimationStat();
-        // Check if the player is currently in the stab blend tree state
-        if (_playerAnimator.GetCurrentAnimatorStateInfo(0).IsName("StabAnimationBlendTree"))
-        {
-            // Check if the animation has finished playing (normalizedTime >= 1.0 means 100% completion)
-            if (_playerAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
-            {
-                _playerAnimator.SetBool("isStabbing", false); // Reset after the animation finishes
-            }
-        }
+        UpdateWweaponStat();
     }
 
     /**
@@ -41,42 +44,40 @@ public class PlayerActions : MonoBehaviour
     {
         if (_playerAnimator != null)
         {
-            if (_moveInput.sqrMagnitude > 0) // Check if the player is moving
+            if (_moveInput.sqrMagnitude > 0)
             {
-                // Update last direction based on current input
                 _lastHorizontal = _moveInput.x;
                 _lastVertical = _moveInput.y;
 
-                // Set animator parameters based on the current movement direction
                 _playerAnimator.SetFloat("Horizontal", _lastHorizontal);
                 _playerAnimator.SetFloat("Vertical", _lastVertical);
             }
             else
             {
-                // When the player is idle, retain the last movement direction for idle animation
                 _playerAnimator.SetFloat("Horizontal", _lastHorizontal);
                 _playerAnimator.SetFloat("Vertical", _lastVertical);
             }
-            // Set the speed parameter in the Animator, which controls the transition between idle and movement states
+
             _playerAnimator.SetFloat("Speed", _moveInput.sqrMagnitude);
         }
 
-        // Check if the Animator is not transitioning to or from another state
         if (!_playerAnimator.IsInTransition(0))
         {
-            // Check if the player is currently in the stab blend tree state
             AnimatorStateInfo currentState = _playerAnimator.GetCurrentAnimatorStateInfo(0);
 
-            // Make sure the current state is the StabBlendTree (replace "StabBlendTree" with your actual state name)
-            if (currentState.IsName("StabBlendTree"))
+            if (currentState.IsName("StabAnimationBlendTree") && currentState.normalizedTime >= 1.0f)
             {
-                // Check if the animation has finished playing (normalizedTime >= 1.0 means 100% completion)
-                if (currentState.normalizedTime >= 1.0f)
-                {
-                    _playerAnimator.SetBool("isStabbing", false); // Reset after the animation finishes
-                }
+                _playerAnimator.SetBool("isStabbing", false);
             }
+            ResetShootingAnimation(currentState);
         }
+    }
+
+    void UpdateWweaponStat()
+    {
+        _bulletSpeed = _weaponStat.GetAmmoSpeed();
+        _fireRate = _weaponStat.GetWeaponFireRate();
+        _bulletDamage = _weaponStat.GetWeaponDamage();
     }
 
     /** 
@@ -121,5 +122,73 @@ public class PlayerActions : MonoBehaviour
     {
         if (inputValue.isPressed)
             _playerAnimator.SetBool("isStabbing", true);
+    }
+
+    private void OnFire(InputValue inputValue)
+    {
+        if (Time.time >= _nextFireTime)
+        {
+            if (inputValue.isPressed)
+            {
+                // Handle shooting logic...
+                Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                mousePosition.z = 0;
+
+                Vector2 direction = (mousePosition - transform.position).normalized;
+
+                RotatePlayerSprite(direction);
+
+                GameObject bullet = Instantiate(_bulletPrefab, _gun.position, Quaternion.identity);
+
+                Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+                if (bulletRb != null)
+                {
+                    bulletRb.velocity = direction * _bulletSpeed;
+                }
+            }
+            _nextFireTime = Time.time + _fireRate;
+        }
+    }
+
+    private void RotatePlayerSprite(Vector2 direction)
+    {
+        // Directly flip the sprite based on horizontal direction
+        if (direction.x > 0)
+        {
+            _playerAnimator.SetBool("isShootingRight", true);
+        }
+        else if (direction.x < 0)
+        {
+            _playerAnimator.SetBool("isShootingLeft", true);
+        }
+        else if(direction.y > 0)
+        {
+            _playerAnimator.SetBool("isShootingUp", true);
+
+        }
+        else if(direction.y < 0)
+        {
+            _playerAnimator.SetBool("isShootingDown", true);
+        }
+    }
+
+    private void ResetShootingAnimation(AnimatorStateInfo currentState)
+    {
+        if (currentState.IsName("ShootRight") && currentState.normalizedTime >= 1.0f)
+        {
+            _playerAnimator.SetBool("isShootingRight", false);
+        }
+        if (currentState.IsName("ShootLeft") && currentState.normalizedTime >= 1.0f)
+        {
+            _playerAnimator.SetBool("isShootingLeft", false);
+        }
+        if (currentState.IsName("ShootUp") && currentState.normalizedTime >= 1.0f)
+        {
+            _playerAnimator.SetBool("isShootingUp", false);
+        }
+        if (currentState.IsName("ShootDown") && currentState.normalizedTime >= 1.0f)
+        {
+            _playerAnimator.SetBool("isShootingDown", false);
+        }
     }
 }
