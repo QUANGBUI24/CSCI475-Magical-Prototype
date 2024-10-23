@@ -152,23 +152,30 @@ public class PlayerActions : MonoBehaviour
 
     private void RotatePlayerSprite(Vector2 direction)
     {
-        // Directly flip the sprite based on horizontal direction
-        if (direction.x > 0)
-        {
-            _playerAnimator.SetBool("isShootingRight", true);
-        }
-        else if (direction.x < 0)
-        {
-            _playerAnimator.SetBool("isShootingLeft", true);
-        }
-        else if(direction.y > 0)
-        {
-            _playerAnimator.SetBool("isShootingUp", true);
+        float threshold = 0.001f; // Set a threshold to give vertical direction priority when needed
 
-        }
-        else if(direction.y < 0)
+        // Prioritize shooting up or down when vertical movement is significant
+        if (Mathf.Abs(direction.y) > Mathf.Abs(direction.x) + threshold)
         {
-            _playerAnimator.SetBool("isShootingDown", true);
+            if (direction.y > 0)
+            {
+                _playerAnimator.SetBool("isShootingUp", true);
+            }
+            else if (direction.y < 0)
+            {
+                _playerAnimator.SetBool("isShootingDown", true);
+            }
+        }
+        else // Otherwise, prioritize horizontal movement
+        {
+            if (direction.x > 0)
+            {
+                _playerAnimator.SetBool("isShootingRight", true);
+            }
+            else if (direction.x < 0)
+            {
+                _playerAnimator.SetBool("isShootingLeft", true);
+            }
         }
     }
 
