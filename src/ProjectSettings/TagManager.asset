@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ammo
+  - SmallEnemy
+  - Weapon
+  - Obstacle
   layers:
   - Default
   - TransparentFX

@@ -4,29 +4,33 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerActions : MonoBehaviour
-{
-    [SerializeField] float _playerMoveSpeed = 5f;   // Player's movement speed, adjustable in the Inspector
+{ 
     [SerializeField] Rigidbody2D _playerRigidBody;  // Reference to the Rigidbody2D component for applying physics-based movement
     [SerializeField] Animator _playerAnimator;      // Reference to the Animator component to handle player animations
     [SerializeField] Texture2D _crosshairTexture;
     [SerializeField] GameObject _bulletPrefab;
     [SerializeField] Transform _gun;
+    [SerializeField] GameObject _player;
 
     WeaponStat _weaponStat;
+    PlayerStats _playerStat;
     Vector2 _moveInput;          // Stores the input for player movement (horizontal and vertical axis)
+    float _nextFireTime = 0f; // Tracks when the gun can shoot next
     float _lastHorizontal = 0f;  // Stores the last non-zero horizontal input value (for direction when idle)
     float _lastVertical = -1f;   // Stores the last non-zero vertical input value (default facing down)
     float _bulletSpeed;
     float _fireRate;
-    float _bulletDamage;
-    float _nextFireTime = 0f; // Tracks when the gun can shoot next
+    float _gunDamage;
+    float _playerMoveSpeed;
 
     void Start()
     {
         _weaponStat = _gun.GetComponent<WeaponStat>();
+        _playerStat = _player.GetComponent<PlayerStats>();
         _bulletSpeed = _weaponStat.GetAmmoSpeed();
         _fireRate = _weaponStat.GetWeaponFireRate();
-        _bulletDamage = _weaponStat.GetWeaponDamage();
+        _gunDamage = _weaponStat.GetWeaponDamage();
+        _playerMoveSpeed = _playerStat.GetPlayerMoveSpeed();
         // Change the cursor to the crosshair and hide the default system cursor
         Cursor.SetCursor(_crosshairTexture, Vector2.zero, CursorMode.Auto);
     }
@@ -34,7 +38,7 @@ public class PlayerActions : MonoBehaviour
     void Update()
     {
         UpdatePlayerAnimationStat();
-        UpdateWweaponStat();
+        UpdateStats();
     }
 
     /**
@@ -73,11 +77,12 @@ public class PlayerActions : MonoBehaviour
         }
     }
 
-    void UpdateWweaponStat()
+    void UpdateStats()
     {
         _bulletSpeed = _weaponStat.GetAmmoSpeed();
         _fireRate = _weaponStat.GetWeaponFireRate();
-        _bulletDamage = _weaponStat.GetWeaponDamage();
+        _gunDamage = _weaponStat.GetWeaponDamage();
+        _playerMoveSpeed = _playerStat.GetPlayerMoveSpeed();
     }
 
     /** 

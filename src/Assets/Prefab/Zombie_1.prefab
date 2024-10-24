@@ -14,9 +14,11 @@ GameObject:
   - component: {fileID: 249359470977093184}
   - component: {fileID: 8974866295591137563}
   - component: {fileID: 7184546491663268544}
+  - component: {fileID: 8419171709300522263}
+  - component: {fileID: 4288689433189416786}
   m_Layer: 7
   m_Name: Zombie_1
-  m_TagString: Untagged
+  m_TagString: SmallEnemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -165,7 +167,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -196,13 +198,41 @@ MonoBehaviour:
   _enemyMoveSpeed: 1
   _enemyRigidBody: {fileID: 249359470977093184}
   _enemyAnimator: {fileID: 3602222769263613046}
-  _raycastDistance: 1
+  _raycastDistance: 0.5
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 8
-  idleTimeMin: 3
-  idleTimeMax: 5
+  idleTimeMin: 2
+  idleTimeMax: 3
   moveTimeMin: 3
   moveTimeMax: 5
   _playerTransform: {fileID: 0}
-  detectionRadius: 3
+  detectionRadius: 1
+--- !u!114 &8419171709300522263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8510657868384080198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03d14ff8481c9b64dac7c9f3e7262251, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enemyHealth: 50
+  _enemyDamage: 10
+--- !u!114 &4288689433189416786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8510657868384080198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90a556caec4fe5b418cc2899d1beabd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gun: {fileID: 0}
+  _enemy: {fileID: 8510657868384080198}

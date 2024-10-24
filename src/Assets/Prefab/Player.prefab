@@ -15,7 +15,8 @@ GameObject:
   - component: {fileID: 2460993576394958810}
   - component: {fileID: 2788085332532764535}
   - component: {fileID: 7105190118199825445}
-  m_Layer: 0
+  - component: {fileID: 8775535976773638865}
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -225,12 +226,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe001880c3ce1634094a5d1c45629bbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerMoveSpeed: 1.5
   _playerRigidBody: {fileID: 2460993576394958810}
   _playerAnimator: {fileID: 4524164657484626787}
   _crosshairTexture: {fileID: 2800000, guid: 115e3776050d06f44aeaae2a1e996c7c, type: 3}
   _bulletPrefab: {fileID: 1618814606386977305, guid: c4e9e2872b28e234aa539ce5d4edb095, type: 3}
   _gun: {fileID: 7692458566198883836}
+  _player: {fileID: 779747059834511124}
+--- !u!114 &8775535976773638865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 779747059834511124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a13d859543d7ef45b76fa1717336df2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerHealth: 100
+  _meleeDamage: 10
+  _playerMoveSpeed: 1
 --- !u!1 &7329007712238144084
 GameObject:
   m_ObjectHideFlags: 0
@@ -241,7 +257,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7692458566198883836}
   - component: {fileID: 8368258794537184499}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Gun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -257,7 +273,7 @@ Transform:
   m_GameObject: {fileID: 7329007712238144084}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.065, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -275,6 +291,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 277cdb0c68ac1594cbf564e8641685ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ammoSpeed: 10
-  _fireRate: 1
+  _ammoSpeed: 5
+  _fireRate: 0.7
   _weaponDamage: 10
